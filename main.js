@@ -1,34 +1,43 @@
 
-let keyGenerate = false
+//Global Variables 
+var keyGenerate = false
+var encryptionPublicKey
+var encryptionPrivateKey
+var signingPublicKey
+var signingPrivateKey
 
-function generate(){
-    if(!keyGenerate){
-
-        encryptionKeyPair = forge.pki.rsa.generateKeyPair();
-        encryptionPublicKey = encryptionKeyPair.publicKey;
-        encryptionPrivateKey = encryptionKeyPair.privateKey;
-
-        document.getElementById("EPbK").textContent = forge.pki.publicKeyToPem(encryptionPublicKey)
-        document.getElementById("EPvk").textContent = forge.pki.publicKeyToPem(encryptionPrivateKey)
-
-        signingKeyPair = forge.pki.rsa.generateKeyPair(2048);
-        signingPublicKey = signingKeyPair.publicKey;
-        signingPrivateKey = signingKeyPair.privateKey;
-
-        document.getElementById("SPbK").textContent = forge.pki.publicKeyToPem(signingPublicKey)
-        document.getElementById("SPvk").textContent = forge.pki.publicKeyToPem(signingPrivateKey)
-
-        console.log("CLICK")
-        keyGenerate = true
-    }else{
+function generateKeys(){
+    if(keyGenerate){
         alert("Keys already generated")
-    }   
+        return
+    }
+        
+    //Generate RSA keys for encryption
+    encryptionKeyPair = forge.pki.rsa.generateKeyPair();
+    encryptionPublicKey = encryptionKeyPair.publicKey;
+    encryptionPrivateKey = encryptionKeyPair.privateKey;
+
+    //Display Encryption key pair
+    document.getElementById("EPbK").textContent = forge.pki.publicKeyToPem(encryptionPublicKey)
+    document.getElementById("EPvk").textContent = forge.pki.publicKeyToPem(encryptionPrivateKey)
+
+    // Generate RSA keys for signing
+    signingKeyPair = forge.pki.rsa.generateKeyPair(2048);
+    signingPublicKey = signingKeyPair.publicKey;
+    signingPrivateKey = signingKeyPair.privateKey;
+        
+    //Display Signing key pair
+    document.getElementById("SPbK").textContent = forge.pki.publicKeyToPem(signingPublicKey)
+    document.getElementById("SPvk").textContent = forge.pki.publicKeyToPem(signingPrivateKey)
+
+    console.log("CLICK")
+    keyGenerate = true
 }
 
 function resetKeys(){
     if(keyGenerate){
         keyGenerate = false
-        msg = "Generate new Keys"
+        msg = "Generate New Keys"
         document.getElementById("EPbK").textContent = msg
         document.getElementById("EPvk").textContent = msg
         document.getElementById("SPbK").textContent = msg
@@ -36,15 +45,55 @@ function resetKeys(){
     }
 }
 
+function encryptMessage(){
+    if(!keyGenerate){
+        alert("No keys Generated")
+        return
+    }
+    //Get the user input message
+    message = document.getElementById("message").value
+    encrypted = encryptionPublicKey.encrypt(message, 'RSA-OAEP', {
+        md: forge.md.sha256.create(),
+        mgf1: forge.mgf1.create(forge.md.sha256.create())
+        });
+
+    document.getElementById("encryptedMessage").textContent = encrypted
+    
+    console.log(encrypted)
+}
+
+function decryptMessage(){
+    encryptedMessage = document.getElementById("encryptedMessage").textContent
+
+    decrypted = encryptionPrivateKey.decrypt(encryptedMessage, 'RSA-OAEP', {
+        md: forge.md.sha256.create(),
+        mgf1: forge.mgf1.create(forge.md.sha256.create())
+    });
+
+    if(document.getElementById("message").value == decrypted ){
+        console.log("YEYAA")
+    }else{
+        console.log("DAMN DONE DIS SHIT")
+    }
+    console.log(decrypted)
+}
+
+function randomMessage(){
+    characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    charactersLength = characters.length;
+    result = ' '
+    for ( let i = 0; i < Math.floor((Math.random()*10) + 140); i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    document.getElementById("message").value = result
+
+    console.log(result)
+}
+
 
 
 function do_this(){
-    // Generate RSA keys for encryption
-    
-    
-
-    // Generate RSA keys for signing
-    
 
     // Message to be encrypted and signed
     const message = 'Secret Message';

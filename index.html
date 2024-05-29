@@ -14,20 +14,29 @@
                     <div class="key_parent_cont">
                         <div class="key_child_cont">
                             <p>Encryption Public Key</p>
-                            <p class="keys" id="EPbK"> Generate new Keys </p>
+                            <p class="keys" id="EPbK"> Generate New Keys </p>
                             <p>Encryption Private Key</p>
-                            <p class="keys" id="EPvk"> Generate new Keys </p>
+                            <p class="keys" id="EPvk"> Generate New Keys </p>
                             </div>
                         <div class="key_child_cont">
                             <p>Signing Public Key</p>
-                            <p class="keys" id="SPbK"> Generate new Keys </p>
+                            <p class="keys" id="SPbK"> Generate New Keys </p>
                             <p>Signing Private Key</p>
-                            <p class="keys" id="SPvk"> Generate new Keys </p>
+                            <p class="keys" id="SPvk"> Generate New Keys </p>
                         </div>
                     </div>
                     
-                    <button onclick="generate()"> Generate Keypair</button>
+                    <button onclick="generateKeys()"> Generate Keypair</button>
                     <button onclick="resetKeys()">reset</button>
+
+                    <div class="message_parent_cont">
+                        <input type="text" id="message" placeholder="Enter Message Here">
+                        <p id="encryptedMessage">This is the shit</p>
+                    </div>
+
+                    <button onclick="encryptMessage()"> Encrypt Message </button>
+                    <button onclick="randomMessage()"> Randomize Message </button>
+                    <button onclick="decryptMessage()"> decryptMessage</button>
                 </div>
             </body>
         </html>
