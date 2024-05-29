@@ -13,15 +13,15 @@
                 <div id="main_cont">
                     <div class="key_parent_cont">
                         <div class="key_child_cont">
-                            <p>Encryption Public Key</p>
+                            <p>Receiver Public Key</p>
                             <p class="keys" id="EPbK"> Generate New Keys </p>
-                            <p>Encryption Private Key</p>
+                            <p>Receiver Private Key</p>
                             <p class="keys" id="EPvk"> Generate New Keys </p>
                             </div>
                         <div class="key_child_cont">
-                            <p>Signing Public Key</p>
+                            <p>Sender Public Key</p>
                             <p class="keys" id="SPbK"> Generate New Keys </p>
-                            <p>Signing Private Key</p>
+                            <p>Sender Private Key</p>
                             <p class="keys" id="SPvk"> Generate New Keys </p>
                         </div>
                     </div>
@@ -30,13 +30,24 @@
                     <button onclick="resetKeys()">reset</button>
 
                     <div class="message_parent_cont">
-                        <input type="text" id="message" placeholder="Enter Message Here">
-                        <p id="encryptedMessage">This is the shit</p>
+                        <p> Enter a message to encrypt</p>
+                        <input type="text" id="message" placeholder="Enter Message Here"><br>
+                        <button onclick="randomMessage()"> Randomize Message </button>
+                        <button onclick="resetMessage()"> Reset Message </button>
+                        <p> Encrypted Message</p>
+                        <p class="encrypted_signed_Message" id="encryptedMessage"></p>
+                        <p> Encrypted and Signed Message</p>
+                        <p class="encrypted_signed_Message" id="signedEncryptedMessage"></p>
                     </div>
 
-                    <button onclick="encryptMessage()"> Encrypt Message </button>
-                    <button onclick="randomMessage()"> Randomize Message </button>
-                    <button onclick="decryptMessage()"> decryptMessage</button>
+                    <button onclick="encryptMessage()"> Encrypt then Sign Message </button>
+                    <div class="message_parent_cont">
+                        <p> Verify</p>
+                        <p class="verify_decrypt_Message" id="verifyMessage">This is the shit</p>
+                        <p> Decrypted Message</p>
+                        <p class="verify_decrypt_Message" id="decryptMessage">This is the shit</p>
+                    </div>
+                    <button onclick="decryptMessage()"> Verify then Decrypt Message</button>
                 </div>
             </body>
         </html>

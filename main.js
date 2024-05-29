@@ -1,10 +1,11 @@
 
 //Global Variables 
 var keyGenerate = false
-var encryptionPublicKey
-var encryptionPrivateKey
-var signingPublicKey
-var signingPrivateKey
+var encrypted = false
+var receiverPublicKey
+var receiverPrivateKey
+var senderPublicKey
+var senderPrivateKey
 
 function generateKeys(){
     if(keyGenerate){
@@ -12,37 +13,40 @@ function generateKeys(){
         return
     }
         
-    //Generate RSA keys for encryption
-    encryptionKeyPair = forge.pki.rsa.generateKeyPair();
-    encryptionPublicKey = encryptionKeyPair.publicKey;
-    encryptionPrivateKey = encryptionKeyPair.privateKey;
+    //Generate RSA keys for receiver
+    receiverKeyPair = forge.pki.rsa.generateKeyPair()
+    receiverPublicKey = receiverKeyPair.publicKey
+    receiverPrivateKey = receiverKeyPair.privateKey
 
-    //Display Encryption key pair
-    document.getElementById("EPbK").textContent = forge.pki.publicKeyToPem(encryptionPublicKey)
-    document.getElementById("EPvk").textContent = forge.pki.publicKeyToPem(encryptionPrivateKey)
+    //Display receiver key pair
+    document.getElementById("EPbK").textContent = forge.pki.publicKeyToPem(receiverPublicKey)
+    document.getElementById("EPvk").textContent = forge.pki.publicKeyToPem(receiverPrivateKey)
 
-    // Generate RSA keys for signing
-    signingKeyPair = forge.pki.rsa.generateKeyPair(2048);
-    signingPublicKey = signingKeyPair.publicKey;
-    signingPrivateKey = signingKeyPair.privateKey;
+    // Generate RSA keys for sender
+    senderKeyPair = forge.pki.rsa.generateKeyPair(2048)
+    senderPublicKey = senderKeyPair.publicKey
+    senderPrivateKey = senderKeyPair.privateKey
         
-    //Display Signing key pair
-    document.getElementById("SPbK").textContent = forge.pki.publicKeyToPem(signingPublicKey)
-    document.getElementById("SPvk").textContent = forge.pki.publicKeyToPem(signingPrivateKey)
+    //Display sender key pair
+    document.getElementById("SPbK").textContent = forge.pki.publicKeyToPem(senderPublicKey)
+    document.getElementById("SPvk").textContent = forge.pki.publicKeyToPem(senderPrivateKey)
 
     console.log("CLICK")
     keyGenerate = true
+    alert("Key Pairs Generated")
 }
 
 function resetKeys(){
     if(keyGenerate){
         keyGenerate = false
-        msg = "Generate New Keys"
-        document.getElementById("EPbK").textContent = msg
-        document.getElementById("EPvk").textContent = msg
-        document.getElementById("SPbK").textContent = msg
-        document.getElementById("SPvk").textContent = msg
     }
+
+    msg = "Generate New Keys"
+    document.getElementById("EPbK").textContent = msg
+    document.getElementById("EPvk").textContent = msg
+    document.getElementById("SPbK").textContent = msg
+    document.getElementById("SPvk").textContent = msg
+    
 }
 
 function encryptMessage(){
@@ -50,85 +54,108 @@ function encryptMessage(){
         alert("No keys Generated")
         return
     }
+
     //Get the user input message
     message = document.getElementById("message").value
-    encrypted = encryptionPublicKey.encrypt(message, 'RSA-OAEP', {
+
+    if(message == ""){
+        alert("Enter A Message")
+        return
+    }
+
+    document.getElementById("message").readOnly = true
+
+    //Encrypt the user message using RSA-OAEP
+    encryptedMessage = receiverPublicKey.encrypt(message, 'RSA-OAEP', {
         md: forge.md.sha256.create(),
         mgf1: forge.mgf1.create(forge.md.sha256.create())
-        });
+        })
 
-    document.getElementById("encryptedMessage").textContent = encrypted
     
-    console.log(encrypted)
+    //Displaying the encrypted message
+    document.getElementById("encryptedMessage").textContent = encryptedMessage
+    
+    
+    //Signed the encrypted message
+    md = forge.md.sha256.create()
+    md.update(encryptedMessage, 'utf8')
+    signedMessage = senderPrivateKey.sign(md)
+    
+    //Displaying the signed message
+    document.getElementById("signedEncryptedMessage").textContent = signedMessage
+
+    encrypted = true
+}
+
+function resetMessage(){
+    if(encrypted){
+        alert("Resetting Encrypted Message")
+    }
+
+    document.getElementById("message").readOnly = false
+    document.getElementById("message").value = ""
+    encrypted = false
+    document.getElementById("encryptedMessage").textContent = ""
+    document.getElementById("signedEncryptedMessage").textContent = ""
+    document.getElementById("verifyMessage").textContent = ""
+    document.getElementById("decryptMessage").textContent = ""
+}
+
+function randomMessage(){
+    if(encrypted){
+        resetMessage()
+    }
+
+    characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    charactersLength = characters.length
+    result = ' '
+    for ( let i = 0; i < Math.floor((Math.random()*10) + 140); i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    }
+
+    document.getElementById("message").value = result
 }
 
 function decryptMessage(){
-    encryptedMessage = document.getElementById("encryptedMessage").textContent
+    if(!encrypted){
+        alert("Encrypt A Message First!")
+        return
+    }
 
-    decrypted = encryptionPrivateKey.decrypt(encryptedMessage, 'RSA-OAEP', {
+    encryptedMessage = document.getElementById("encryptedMessage").textContent
+    signedMessage = document.getElementById("signedEncryptedMessage").textContent
+
+    // Verify the signature using the sender's public key
+    verifyMd = forge.md.sha256.create()
+    verifyMd.update(encryptedMessage, 'utf8')
+    isValid = senderPublicKey.verify(verifyMd.digest().bytes(), signedMessage)
+ 
+    if (isValid) {
+        console.log('Signature is valid')
+        document.getElementById("verifyMessage").textContent = "Signature is Valid"
+    
+        // Decrypt the message using the receiver's private key
+        decryptedMessage = receiverPrivateKey.decrypt(encryptedMessage, 'RSA-OAEP', {
+            md: forge.md.sha256.create(),
+            mgf1: forge.mgf1.create(forge.md.sha256.create())
+        })
+ 
+        document.getElementById("decryptMessage").textContent = decryptedMessage
+    } else {
+        console.log('Signature verification failed')
+        document.getElementById("verifyMessage").textContent = "Signature verification failed"
+    }
+
+    decrypted = receiverPrivateKey.decrypt(encryptedMessage, 'RSA-OAEP', {
         md: forge.md.sha256.create(),
         mgf1: forge.mgf1.create(forge.md.sha256.create())
-    });
+    })
 
     if(document.getElementById("message").value == decrypted ){
         console.log("YEYAA")
     }else{
         console.log("DAMN DONE DIS SHIT")
     }
-    console.log(decrypted)
-}
-
-function randomMessage(){
-    characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    charactersLength = characters.length;
-    result = ' '
-    for ( let i = 0; i < Math.floor((Math.random()*10) + 140); i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-
-    document.getElementById("message").value = result
-
-    console.log(result)
 }
 
 
-
-function do_this(){
-
-    // Message to be encrypted and signed
-    const message = 'Secret Message';
-
-    // Encrypt the message using RSA-OAEP
-    const encryptedMessage = encryptionPublicKey.encrypt(message, 'RSA-OAEP', {
-    md: forge.md.sha256.create(),
-    mgf1: forge.mgf1.create(forge.md.sha256.create())
-    });
-
-    // Sign the encrypted message using the signing private key
-    const md = forge.md.sha256.create();
-    md.update(encryptedMessage, 'utf8');
-    const signature = signingPrivateKey.sign(md);
-
-    // Transmit encryptedMessage and signature
-
-    // On the receiver side:
-
-    // Verify the signature using the sender's public key
-    const verifyMd = forge.md.sha256.create();
-    verifyMd.update(encryptedMessage, 'utf8');
-    const isValid = signingPublicKey.verify(verifyMd.digest().bytes(), signature);
-
-    if (isValid) {
-    console.log('Signature is valid.');
-
-    // Decrypt the message using the receiver's private key
-    const decryptedMessage = encryptionPrivateKey.decrypt(encryptedMessage, 'RSA-OAEP', {
-        md: forge.md.sha256.create(),
-        mgf1: forge.mgf1.create(forge.md.sha256.create())
-    });
-
-    console.log('Decrypted message:', decryptedMessage);
-    } else {
-    console.log('Signature verification failed.');
-    }
-}
