@@ -7,14 +7,14 @@
                 <link rel="stylesheet" href="style.css">
                 <script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js"></script>
                 <script src="main.js"></script>
-                <title>Document</title>
+                <title>Machine Problem 2</title>
             </head>
             <body>
                 <div id="main_cont">
                     <h1> Machine Problem 2</h1>
                     <hr>
-                    <p> This webpage will serve as both my writeup and source code. I will discuss step by step with a demo the whole process of encrypt-then-sign/verify-then-decrypt a message using RSA-OAE.</p>
-                    <p> In this machine problem I used the node-forge library to generate keypairs, encrypt, decrypt, sign, and verify. <a href="https://www.npmjs.com/package/node-forge"> node-forge documentation </a> </p>
+                    <p> This webpage will serve as both my writeup and source code. I will discuss and demonstrate step by step the whole process of encrypt-then-sign/verify-then-decrypt a message using RSA-OAE.</p>
+                    <p> In this machine problem, I used the node-forge library to generate keypairs, encrypt, decrypt, sign, and verify. <a href="https://www.npmjs.com/package/node-forge"> node-forge documentation </a> </p>
                     <hr>
                     <h3> Generate Keypairs </h3>
                     <p> First we generate keypairs for the receiver (Encryption) and sender (Signing). Using the syntax below I was able to generate the keypairs.</p>
@@ -29,6 +29,8 @@ senderKeyPair = forge.pki.rsa.generateKeyPair()
 senderPublicKey = senderKeyPair.publicKey
 senderPrivateKey = senderKeyPair.privateKey</code>
                     </div>
+
+                    <h4> Instructions </h4>
                     <p> Click the button <i>generate keys</i> to generate a two keypairs. Generating the keys might take a while.</p>
 
                     <button onclick="generateKeys()"> Generate Keypair</button>
@@ -69,14 +71,16 @@ signedMessage = senderPrivateKey.sign(md)
 </code>
                     </div>
 
+                    <h4> Instructions </h4>
                     <p> Enter a message or randomize it. Click the button <i>encrypt then sign message</i> to Encrpyt and Sign the message</p>
 
-                    <button onclick="encryptMessage()"> Encrypt then Sign Message </button>
+                    
                     <div class="message_parent_cont">
                         <p> Enter a message to encrypt</p>
                         <input type="text" id="message" placeholder="Enter Message Here"><br>
                         <button onclick="randomMessage()"> Randomize Message </button>
-                        <button onclick="resetMessage()"> Reset Message </button>
+                        <button onclick="resetMessage()"> Reset Message </button><br><br>
+                        <button onclick="encryptMessage()"> Encrypt then Sign Message </button>
                         <p> Encrypted Message</p>
                         <p class="encrypted_signed_Message" id="encryptedMessage"></p>
                         <p> Encrypted and Signed Message</p>
@@ -101,15 +105,16 @@ decryptedMessage = receiverPrivateKey.decrypt(encryptedMessage, 'RSA-OAEP', {
 })
 </code>
                     </div>
-
-                    <p> Click the button <i>verify then decrypt message</i> to verify the signature and if the signature is good, we then decrypt the encrypted message</p>
                     
+                    <h4> Instructions </h4>
+                    <p> Click the button <i>verify then decrypt message</i> to verify the signature and if the signature is good, we then decrypt the encrypted message</p>
+
                     <button onclick="decryptMessage()"> Verify then Decrypt Message</button>
                     <div class="message_parent_cont">
                         <p> Verify</p>
-                        <p class="verify_decrypt_Message" id="verifyMessage">This is the shit</p>
+                        <p class="verify_decrypt_Message" id="verifyMessage"></p>
                         <p> Decrypted Message</p>
-                        <p class="verify_decrypt_Message" id="decryptMessage">This is the shit</p>
+                        <p class="verify_decrypt_Message" id="decryptMessage"></p>
                     </div>
                     
                 </div>
