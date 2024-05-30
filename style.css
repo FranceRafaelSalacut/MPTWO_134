@@ -1,9 +1,11 @@
 body{
-    font-size: 16px;
+    font-size: 18px;
+    font-style: verdana;
     background-color: antiquewhite;
 }
 
 #main_cont{
+    text-align: justify;
     margin-left: 20%;
     margin-right: 20%;
     padding: 1%;
@@ -16,11 +18,13 @@ div.key_parent_cont{
     grid-template-columns: 1fr 1fr; 
     grid-gap: 20px; 
     border: 2px solid black;
-    margin-bottom: 3%;
+    margin-top: 1%;
+    margin-bottom: 1%;
     border-radius: 10px;
 }
 
 div.key_child_cont{
+    text-align: left;
     display: inline;
     vertical-align: middle;
     padding: 2%;
@@ -28,7 +32,7 @@ div.key_child_cont{
 }
 
 p.keys{
-    font-size: 14px;
+    font-size: 80%;
     height: 100px;
     border: 1px solid black;
     overflow: scroll;
@@ -36,8 +40,8 @@ p.keys{
 
 div.message_parent_cont{
     border: 2px solid black;
-    margin-top: 3%;
-    margin-bottom: 3%;
+    margin-top: 1%;
+    margin-bottom: 1%;
     border-radius: 10px;
     padding: 1%;
 }
@@ -49,6 +53,7 @@ div.message_parent_cont{
 }
 
 p.encrypted_signed_Message{
+    text-align: left;
     font-size: 14px;
     height: 80px;
     border: 1px solid black;
@@ -65,5 +70,19 @@ p.verify_decrypt_Message{
     overflow: scroll;
 }
 
+div.code_cont{
+    padding: 1%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #f1f1f1;
+    width: 70%;
+}
 
-
+code {
+    white-space: pre-wrap;
+    font-style: italic;
+    color: green;
+    background-color: #f1f1f1;
+    padding: 2px;
+    font-size: 80%;
+}

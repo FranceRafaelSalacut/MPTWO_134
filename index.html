@@ -11,6 +11,29 @@
             </head>
             <body>
                 <div id="main_cont">
+                    <h1> Machine Problem 2</h1>
+                    <hr>
+                    <p> This webpage will serve as both my writeup and source code. I will discuss step by step with a demo the whole process of encrypt-then-sign/verify-then-decrypt a message using RSA-OAE.</p>
+                    <p> In this machine problem I used the node-forge library to generate keypairs, encrypt, decrypt, sign, and verify. <a href="https://www.npmjs.com/package/node-forge"> node-forge documentation </a> </p>
+                    <hr>
+                    <h3> Generate Keypairs </h3>
+                    <p> First we generate keypairs for the receiver (Encryption) and sender (Signing). Using the syntax below I was able to generate the keypairs.</p>
+                    <div class="code_cont">
+                    <code>//Generate RSA keys for receiver
+receiverKeyPair = forge.pki.rsa.generateKeyPair()
+receiverPublicKey = receiverKeyPair.publicKey
+receiverPrivateKey = receiverKeyPair.privateKey
+
+// Generate RSA keys for sender
+senderKeyPair = forge.pki.rsa.generateKeyPair()
+senderPublicKey = senderKeyPair.publicKey
+senderPrivateKey = senderKeyPair.privateKey</code>
+                    </div>
+                    <p> Click the button <i>generate keys</i> to generate a two keypairs. Generating the keys might take a while.</p>
+
+                    <button onclick="generateKeys()"> Generate Keypair</button>
+                    <button onclick="resetKeys()">reset</button>
+
                     <div class="key_parent_cont">
                         <div class="key_child_cont">
                             <p>Receiver Public Key</p>
@@ -25,10 +48,30 @@
                             <p class="keys" id="SPvk"> Generate New Keys </p>
                         </div>
                     </div>
-                    
-                    <button onclick="generateKeys()"> Generate Keypair</button>
-                    <button onclick="resetKeys()">reset</button>
 
+                    <h3> Encryption and Signing </h3>
+                    <p> Once we have generated the keys we can then use them to encrypt and sign a message.</p>
+                    <p> As a sender who wants to send a message to a receiver, we will use the <b>receiver's public key</b> and <b>sender's private key.</b></p>
+                    <p> Using the <b>receiver's public key</b> we encrypt the message. The syntax below shows how it's done. </p>
+                    <div class="code_cont">
+                        <code>//Encrypt the user message using RSA-OAEP
+encryptedMessage = receiverPublicKey.encrypt(message, 'RSA-OAEP', {
+    md: forge.md.sha256.create(),
+    mgf1: forge.mgf1.create(forge.md.sha256.create())
+})</code>
+                    </div>
+                    <p> After the message is encrypted we will then use the <b>sender's private key</b> to sign the encrypted message. The syntax below shows how it's done</p>
+                    <div class="code_cont">
+                        <code>//Sign the encrypted message
+md = forge.md.sha256.create()
+md.update(encryptedMessage, 'utf8')
+signedMessage = senderPrivateKey.sign(md)
+</code>
+                    </div>
+
+                    <p> Enter a message or randomize it. Click the button <i>encrypt then sign message</i> to Encrpyt and Sign the message</p>
+
+                    <button onclick="encryptMessage()"> Encrypt then Sign Message </button>
                     <div class="message_parent_cont">
                         <p> Enter a message to encrypt</p>
                         <input type="text" id="message" placeholder="Enter Message Here"><br>
@@ -40,14 +83,35 @@
                         <p class="encrypted_signed_Message" id="signedEncryptedMessage"></p>
                     </div>
 
-                    <button onclick="encryptMessage()"> Encrypt then Sign Message </button>
+                    <p> As a receiver we will get an encrypted message, we will use the <b>sender's public key</b> and <b>receiver's private key</b></p>
+                    <p> Using the <b>sender's public key</b> we will verify the signature on the encrypted message. The syntax below shows how it's done</p>
+                    <div class="code_cont">
+                        <code>// Verify the signature using the sender's public key
+verifyMd = forge.md.sha256.create()
+verifyMd.update(encryptedMessage, 'utf8')
+isValid = senderPublicKey.verify(verifyMd.digest().bytes(), signedMessage)
+</code>
+                    </div>
+                    <p> After the signature is verified, we will then decrypt the encrypted message using the <b>receiver's private key</b>. The syntax below shows how it's done </p>
+                    <div class="code_cont">
+                        <code>// Decrypt the message using the receiver's private key
+decryptedMessage = receiverPrivateKey.decrypt(encryptedMessage, 'RSA-OAEP', {
+    md: forge.md.sha256.create(),
+    mgf1: forge.mgf1.create(forge.md.sha256.create())
+})
+</code>
+                    </div>
+
+                    <p> Click the button <i>verify then decrypt message</i> to verify the signature and if the signature is good, we then decrypt the encrypted message</p>
+                    
+                    <button onclick="decryptMessage()"> Verify then Decrypt Message</button>
                     <div class="message_parent_cont">
                         <p> Verify</p>
                         <p class="verify_decrypt_Message" id="verifyMessage">This is the shit</p>
                         <p> Decrypted Message</p>
                         <p class="verify_decrypt_Message" id="decryptMessage">This is the shit</p>
                     </div>
-                    <button onclick="decryptMessage()"> Verify then Decrypt Message</button>
+                    
                 </div>
             </body>
         </html>

@@ -23,7 +23,7 @@ function generateKeys(){
     document.getElementById("EPvk").textContent = forge.pki.publicKeyToPem(receiverPrivateKey)
 
     // Generate RSA keys for sender
-    senderKeyPair = forge.pki.rsa.generateKeyPair(2048)
+    senderKeyPair = forge.pki.rsa.generateKeyPair()
     senderPublicKey = senderKeyPair.publicKey
     senderPrivateKey = senderKeyPair.privateKey
         
@@ -76,7 +76,7 @@ function encryptMessage(){
     document.getElementById("encryptedMessage").textContent = encryptedMessage
     
     
-    //Signed the encrypted message
+    //Sign the encrypted message
     md = forge.md.sha256.create()
     md.update(encryptedMessage, 'utf8')
     signedMessage = senderPrivateKey.sign(md)
